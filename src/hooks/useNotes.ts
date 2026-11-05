@@ -1,8 +1,28 @@
 import { useState } from 'react';
 import type { Note } from '../types/note';
 
-export function useNotes() {
-  const [notes] = useState<Note[]>([]);
+type NewNote = Omit<Note, 'id' | 'zIndex'>;
 
-  return { notes };
+export function useNotes() {
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  function addNote(newNote: NewNote) {
+    setNotes((currentNotes) => {
+      const highestZIndex = currentNotes.reduce(
+        (highest, note) => Math.max(highest, note.zIndex),
+        0,
+      );
+
+      return [
+        ...currentNotes,
+        {
+          ...newNote,
+          id: crypto.randomUUID(),
+          zIndex: highestZIndex + 1,
+        },
+      ];
+    });
+  }
+
+  return { notes, addNote };
 }
