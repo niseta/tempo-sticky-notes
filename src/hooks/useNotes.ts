@@ -40,6 +40,12 @@ export function useNotes() {
     );
   }
 
+  function deleteNote(id: Note['id']) {
+    setNotes((currentNotes) =>
+      currentNotes.filter((note) => note.id !== id),
+    );
+  }
+
   function bringToFront(id: Note['id']) {
     setNotes((currentNotes) => {
       const highestZIndex = currentNotes.reduce(
@@ -53,5 +59,5 @@ export function useNotes() {
     });
   }
 
-  return { notes, addNote, moveNote, resizeNote, bringToFront };
+  return { notes, addNote, moveNote, resizeNote, deleteNote, bringToFront };
 }

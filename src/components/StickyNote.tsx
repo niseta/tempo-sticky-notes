@@ -1,13 +1,21 @@
 import { useRef } from "react";
-import type { PointerEvent as ReactPointerEvent, RefObject } from "react";
+import type {
+  Dispatch,
+  PointerEvent as ReactPointerEvent,
+  RefObject,
+  SetStateAction,
+} from "react";
 import type { Note } from "../types/note";
 
 interface StickyNoteProps {
   note: Note;
   boardRef: RefObject<HTMLElement | null>;
+  trashZoneRef: RefObject<HTMLDivElement | null>;
   moveNote: (id: Note["id"], x: number, y: number) => void;
   resizeNote: (id: Note["id"], width: number, height: number) => void;
+  deleteNote: (id: Note["id"]) => void;
   bringToFront: (id: Note["id"]) => void;
+  setIsTrashActive: Dispatch<SetStateAction<boolean>>;
 }
 
 interface DragInfo {
@@ -30,9 +38,12 @@ const MIN_NOTE_HEIGHT = 100;
 export function StickyNote({
   note,
   boardRef,
+  trashZoneRef,
   moveNote,
   resizeNote,
+  deleteNote,
   bringToFront,
+  setIsTrashActive,
 }: StickyNoteProps) {
   const dragInfoRef = useRef<DragInfo | null>(null);
   const resizeInfoRef = useRef<ResizeInfo | null>(null);
@@ -80,12 +91,34 @@ export function StickyNote({
     moveNote(note.id, x, y);
   }
 
+  function isPointerInsideTrash(event: ReactPointerEvent<HTMLDivElement>) {
+    const trashRect = trashZoneRef.current?.getBoundingClientRect();
+
+    return Boolean(
+      trashRect &&
+      event.clientX >= trashRect.left &&
+      event.clientX <= trashRect.right &&
+      event.clientY >= trashRect.top &&
+      event.clientY <= trashRect.bottom,
+    );
+  }
+
+  function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (dragInfoRef.current?.pointerId !== event.pointerId) {
+      return;
+    }
+
+    updatePosition(event);
+    setIsTrashActive(isPointerInsideTrash(event));
+  }
+
   function finishDragging(event: ReactPointerEvent<HTMLDivElement>) {
     if (dragInfoRef.current?.pointerId !== event.pointerId) {
       return;
     }
 
     dragInfoRef.current = null;
+    setIsTrashActive(false);
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -93,8 +126,19 @@ export function StickyNote({
   }
 
   function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
+    if (dragInfoRef.current?.pointerId !== event.pointerId) {
+      return;
+    }
+
     updatePosition(event);
+
+    const shouldDelete = isPointerInsideTrash(event);
+
     finishDragging(event);
+
+    if (shouldDelete) {
+      deleteNote(note.id);
+    }
   }
 
   function handleResizePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
@@ -167,9 +211,10 @@ export function StickyNote({
     <div
       className="overflow-hidden bg-yellow-200 p-4 text-slate-800 shadow-md"
       onPointerDown={handlePointerDown}
-      onPointerMove={updatePosition}
+      onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={finishDragging}
+      onLostPointerCapture={finishDragging}
       style={{
         position: "absolute",
         left: note.x,
