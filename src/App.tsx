@@ -2,7 +2,7 @@ import { Board } from './components/Board';
 import { useNotes } from './hooks/useNotes';
 
 function App() {
-  const { notes, addNote } = useNotes();
+  const { notes, addNote, moveNote, bringToFront } = useNotes();
 
   function handleAddNote() {
     addNote({
@@ -27,7 +27,11 @@ function App() {
           Add Note
         </button>
       </header>
-      <Board notes={notes} />
+      <Board
+        notes={notes}
+        moveNote={moveNote}
+        bringToFront={bringToFront}
+      />
     </main>
   );
 }
