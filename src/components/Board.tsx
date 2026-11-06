@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { Note } from "../types/note";
+import type { Note, NoteColor } from "../types/note";
 import { StickyNote } from "./StickyNote";
 import { TrashZone } from "./TrashZone";
 
@@ -8,6 +8,7 @@ interface BoardProps {
   moveNote: (id: Note["id"], x: number, y: number) => void;
   resizeNote: (id: Note["id"], width: number, height: number) => void;
   updateNoteText: (id: Note["id"], text: string) => void;
+  updateNoteColor: (id: Note["id"], color: NoteColor) => void;
   deleteNote: (id: Note["id"]) => void;
   bringToFront: (id: Note["id"]) => void;
 }
@@ -17,6 +18,7 @@ export function Board({
   moveNote,
   resizeNote,
   updateNoteText,
+  updateNoteColor,
   deleteNote,
   bringToFront,
 }: BoardProps) {
@@ -36,6 +38,7 @@ export function Board({
             moveNote={moveNote}
             resizeNote={resizeNote}
             updateNoteText={updateNoteText}
+            updateNoteColor={updateNoteColor}
             deleteNote={deleteNote}
             bringToFront={bringToFront}
             setIsTrashActive={setIsTrashActive}

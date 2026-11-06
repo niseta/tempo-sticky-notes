@@ -8,6 +8,7 @@ function App() {
     moveNote,
     resizeNote,
     updateNoteText,
+    updateNoteColor,
     deleteNote,
     bringToFront,
   } = useNotes();
@@ -40,6 +41,7 @@ function App() {
         moveNote={moveNote}
         resizeNote={resizeNote}
         updateNoteText={updateNoteText}
+        updateNoteColor={updateNoteColor}
         deleteNote={deleteNote}
         bringToFront={bringToFront}
       />

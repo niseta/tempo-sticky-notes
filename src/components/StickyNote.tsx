@@ -5,7 +5,7 @@ import type {
   RefObject,
   SetStateAction,
 } from "react";
-import type { Note } from "../types/note";
+import { NOTE_COLORS, type Note, type NoteColor } from "../types/note";
 
 interface StickyNoteProps {
   note: Note;
@@ -14,6 +14,7 @@ interface StickyNoteProps {
   moveNote: (id: Note["id"], x: number, y: number) => void;
   resizeNote: (id: Note["id"], width: number, height: number) => void;
   updateNoteText: (id: Note["id"], text: string) => void;
+  updateNoteColor: (id: Note["id"], color: NoteColor) => void;
   deleteNote: (id: Note["id"]) => void;
   bringToFront: (id: Note["id"]) => void;
   setIsTrashActive: Dispatch<SetStateAction<boolean>>;
@@ -36,6 +37,14 @@ interface ResizeInfo {
 const MIN_NOTE_WIDTH = 150;
 const MIN_NOTE_HEIGHT = 100;
 
+const NOTE_COLOR_CLASSES: Record<NoteColor, string> = {
+  yellow: "bg-yellow-200",
+  pink: "bg-pink-200",
+  blue: "bg-blue-200",
+  green: "bg-green-200",
+  purple: "bg-purple-200",
+};
+
 export function StickyNote({
   note,
   boardRef,
@@ -43,11 +52,13 @@ export function StickyNote({
   moveNote,
   resizeNote,
   updateNoteText,
+  updateNoteColor,
   deleteNote,
   bringToFront,
   setIsTrashActive,
 }: StickyNoteProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isColorPickerOpen, setIsColorPickerOpen] = useState(false);
   const dragInfoRef = useRef<DragInfo | null>(null);
   const resizeInfoRef = useRef<ResizeInfo | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -240,9 +251,14 @@ export function StickyNote({
     finishResizing(event);
   }
 
+  function handleColorSelect(color: NoteColor) {
+    updateNoteColor(note.id, color);
+    setIsColorPickerOpen(false);
+  }
+
   return (
     <div
-      className="select-none overflow-hidden bg-yellow-200 p-4 text-slate-800 shadow-md"
+      className={`select-none overflow-hidden p-4 text-slate-800 shadow-md ${NOTE_COLOR_CLASSES[note.color]}`}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -259,6 +275,54 @@ export function StickyNote({
         touchAction: "none",
       }}
     >
+      <div
+        className="absolute top-2 right-2 z-10"
+        onPointerDown={(event) => event.stopPropagation()}
+        onDoubleClick={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="flex h-7 w-7 items-center justify-center rounded text-slate-700/70 hover:bg-white/40 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-slate-600"
+          aria-label="Change note color"
+          aria-expanded={isColorPickerOpen}
+          onClick={() => setIsColorPickerOpen((isOpen) => !isOpen)}
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <ellipse cx="12" cy="12" rx="9" ry="8" />
+            <circle cx="7.5" cy="10.5" r="1.25" fill="#facc15" stroke="none" />
+            <circle cx="9.5" cy="7" r="1.25" fill="#f472b6" stroke="none" />
+            <circle cx="13.5" cy="6.5" r="1.25" fill="#60a5fa" stroke="none" />
+            <circle cx="10.5" cy="13.5" r="1.25" fill="#4ade80" stroke="none" />
+            <circle cx="17" cy="9" r="1.5" />
+          </svg>
+        </button>
+        {isColorPickerOpen && (
+          <div
+            className="mt-1 flex gap-1 rounded-md bg-white/90 p-1.5 shadow"
+            aria-label="Note colors"
+          >
+            {NOTE_COLORS.map((color) => (
+              <button
+                key={color}
+                type="button"
+                className={`h-5 w-5 rounded-full border border-slate-600/20 ${NOTE_COLOR_CLASSES[color]} ${
+                  note.color === color ? "ring-2 ring-slate-600/60" : ""
+                }`}
+                aria-label={`Set note color to ${color}`}
+                aria-pressed={note.color === color}
+                onClick={() => handleColorSelect(color)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
       {isEditing ? (
         <textarea
           ref={textareaRef}

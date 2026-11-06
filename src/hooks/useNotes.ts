@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
-import type { Note } from '../types/note';
+import {
+  DEFAULT_NOTE_COLOR,
+  NOTE_COLORS,
+  type Note,
+  type NoteColor,
+} from '../types/note';
 
-type NewNote = Omit<Note, 'id' | 'zIndex'>;
+type NewNote = Omit<Note, 'id' | 'zIndex' | 'color'>;
 
 const STORAGE_KEY = 'sticky-notes';
 
@@ -12,7 +17,14 @@ export function useNotes() {
         window.localStorage.getItem(STORAGE_KEY) ?? '[]',
       );
 
-      return Array.isArray(savedNotes) ? (savedNotes as Note[]) : [];
+      return Array.isArray(savedNotes)
+        ? (savedNotes as Note[]).map((note) => ({
+            ...note,
+            color: NOTE_COLORS.includes(note.color)
+              ? note.color
+              : DEFAULT_NOTE_COLOR,
+          }))
+        : [];
     } catch {
       return [];
     }
@@ -39,6 +51,7 @@ export function useNotes() {
           ...newNote,
           id: crypto.randomUUID(),
           zIndex: highestZIndex + 1,
+          color: DEFAULT_NOTE_COLOR,
         },
       ];
     });
@@ -68,6 +81,14 @@ export function useNotes() {
     );
   }
 
+  function updateNoteColor(id: Note['id'], color: NoteColor) {
+    setNotes((currentNotes) =>
+      currentNotes.map((note) =>
+        note.id === id ? { ...note, color } : note,
+      ),
+    );
+  }
+
   function deleteNote(id: Note['id']) {
     setNotes((currentNotes) =>
       currentNotes.filter((note) => note.id !== id),
@@ -93,6 +114,7 @@ export function useNotes() {
     moveNote,
     resizeNote,
     updateNoteText,
+    updateNoteColor,
     deleteNote,
     bringToFront,
   };
