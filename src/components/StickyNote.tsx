@@ -5,7 +5,13 @@ import type {
   RefObject,
   SetStateAction,
 } from "react";
-import { NOTE_COLORS, type Note, type NoteColor } from "../types/note";
+import {
+  MIN_NOTE_HEIGHT,
+  MIN_NOTE_WIDTH,
+  NOTE_COLORS,
+  type Note,
+  type NoteColor,
+} from "../types/note";
 
 interface StickyNoteProps {
   note: Note;
@@ -33,9 +39,6 @@ interface ResizeInfo {
   startWidth: number;
   startHeight: number;
 }
-
-const MIN_NOTE_WIDTH = 150;
-const MIN_NOTE_HEIGHT = 100;
 
 const NOTE_COLOR_CLASSES: Record<NoteColor, string> = {
   yellow: "bg-yellow-200",
@@ -279,7 +282,7 @@ export function StickyNote({
 
   return (
     <div
-      className={`select-none overflow-hidden p-4 text-slate-800 shadow-md ${NOTE_COLOR_CLASSES[note.color]}`}
+      className={`cursor-default select-none overflow-hidden p-4 text-slate-800 shadow-md ${NOTE_COLOR_CLASSES[note.color]}`}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}

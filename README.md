@@ -13,7 +13,7 @@ A desktop-focused sticky notes board built with React and TypeScript as a take-h
 
 ## Features
 
-- Create notes with predefined initial dimensions and position, which can be adjusted through dragging and resizing.
+- Create notes by clicking on the board or dragging to define their initial size and position.
 - Drag notes within the board boundaries.
 - Resize notes using the bottom-right handle.
 - Edit note text in place with a double-click.
@@ -50,7 +50,7 @@ npm run preview  # Preview the production build
 ```text
 src/
 ├── components/
-│   ├── Board.tsx        # Board layout and note positioning
+│   ├── Board.tsx        # Board layout and note creation interactions
 │   ├── StickyNote.tsx   # Note UI and pointer interactions
 │   └── TrashZone.tsx    # Drop target for deleting notes
 ├── hooks/
@@ -66,19 +66,19 @@ src/
 
 The application is structured around reusable React components, with state management centralized in a custom `useNotes` hook. This hook handles note creation, updates, deletion, stacking order, and persistence, while the UI components are responsible for rendering and user interactions. TypeScript interfaces define the note data model and provide type safety across the application.
 
-Dragging and resizing are implemented using native Pointer Events and pointer capture, without relying on external drag-and-drop libraries. Interaction data is stored in refs to avoid unnecessary state updates, while note positions and stacking order are managed through React state. Notes are constrained to the board boundaries during dragging.
+Note creation, dragging, and resizing are implemented using native Pointer Events and pointer capture, without relying on external drag-and-drop libraries. Interaction data is stored in refs to avoid unnecessary state updates, while note positions, dimensions, and stacking order are managed through React state. Notes are constrained to the board boundaries during dragging and creation.
 
 Notes are persisted in `localStorage` and restored when the application loads. Storage errors are handled gracefully to keep the application usable even when persistence is unavailable. The application uses Vite for development and production builds, and Tailwind CSS for styling.
 
 ## Assumptions
 
-- New notes are created with predefined dimensions and an initial position.
+- Notes can be created with custom initial dimensions and position by dragging on the board, or with default dimensions by clicking.
 - The application is assumed to be single-user and browser-local, without requiring user accounts or synchronization across devices.
 - Text editing is activated by double-clicking a note to avoid interfering with dragging.
 
 ## Usage
 
-- **Create:** Click **Add Note** to create a new note.
+- **Create:** Click **Add Note**, then click on an empty area of the board to create a note with default dimensions, or drag to define its size and position.
 - **Edit:** Double-click a note to edit its text. Click outside to finish editing.
 - **Move:** Click and drag a note to reposition it.
 - **Resize:** Drag the bottom-right corner to change its size.

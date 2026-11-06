@@ -9,6 +9,10 @@ export const NOTE_COLORS = [
 export type NoteColor = (typeof NOTE_COLORS)[number];
 
 export const DEFAULT_NOTE_COLOR: NoteColor = 'yellow';
+export const DEFAULT_NOTE_WIDTH = 240;
+export const DEFAULT_NOTE_HEIGHT = 180;
+export const MIN_NOTE_WIDTH = 150;
+export const MIN_NOTE_HEIGHT = 100;
 
 export interface Note {
   id: string;
