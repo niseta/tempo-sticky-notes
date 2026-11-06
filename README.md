@@ -1,75 +1,81 @@
-# React + TypeScript + Vite
+# Sticky Notes
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A desktop-focused sticky notes board built with React and TypeScript as a take-home project. Users can create, edit, move, resize, recolor, and delete notes. All changes are automatically saved in the browser and restored across sessions.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19
+- TypeScript
+- Vite 8
+- Tailwind CSS 4
+- ESLint
+- Browser APIs: Pointer Events, `localStorage`, and `crypto.randomUUID()`
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Create notes with default text, size, position, and color.
+- Drag notes within the board boundaries.
+- Resize notes using the bottom-right handle.
+- Edit note text in place with a double-click.
+- Choose from five colors for each note.
+- Bring notes to the front when interacting with them.
+- Delete notes by dragging them into the trash zone.
+- Automatically persist notes in `localStorage`.
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Requirements
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js `^20.19.0` or `>=22.12.0`
+- npm
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+### Available Commands
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run dev      # Start development server
+npm run build    # Type-check and build for production
+npm run lint     # Run ESLint
+npm run preview  # Preview the production build
 ```
+
+## Project Structure
+
+```text
+src/
+├── components/
+│   ├── Board.tsx        # Board layout and note positioning
+│   ├── StickyNote.tsx   # Note UI and pointer interactions
+│   └── TrashZone.tsx    # Drop target for deleting notes
+├── hooks/
+│   └── useNotes.ts      # Note state, operations, and persistence
+├── types/
+│   └── note.ts          # Note model and color definitions
+├── App.tsx              # Application layout and component wiring
+├── index.css            # Global styles and Tailwind CSS
+└── main.tsx             # Application entry point
+```
+
+## Technical Decisions
+
+- **State management:** A custom `useNotes` hook centralizes note operations and persistence, keeping UI components focused on rendering and interactions.
+- **Drag and resize:** Native Pointer Events and pointer capture handle interactions without external drag-and-drop dependencies. Mutable interaction data is stored in refs to avoid unnecessary renders.
+- **Positioning and stacking:** Notes are constrained to the board during dragging and use dynamic `z-index` values to manage overlapping notes.
+- **Persistence:** Notes are stored in `localStorage` and restored on initialization. Storage errors are handled gracefully so the application remains usable.
+- **Type safety:** TypeScript defines the note model and shared types, while `crypto.randomUUID()` generates unique note identifiers.
+
+## Usage
+
+- **Create:** Click **Add Note** to create a new note.
+- **Edit:** Double-click a note to edit its text. Click outside to finish editing.
+- **Move:** Click and drag a note to reposition it.
+- **Resize:** Drag the bottom-right corner to change its size.
+- **Change color:** Click the palette button on a note and select a color.
+- **Bring to front:** Interact with a note to bring it above overlapping notes.
+- **Delete:** Drag a note into the trash zone and release it when highlighted.
