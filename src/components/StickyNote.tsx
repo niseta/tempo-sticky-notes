@@ -276,13 +276,13 @@ export function StickyNote({
       }}
     >
       <div
-        className="absolute top-2 right-2 z-10"
+        className="absolute top-1 right-2 z-10"
         onPointerDown={(event) => event.stopPropagation()}
         onDoubleClick={(event) => event.stopPropagation()}
       >
         <button
           type="button"
-          className="flex h-7 w-7 items-center justify-center rounded text-slate-700/70 hover:bg-white/40 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-slate-600"
+          className="flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-sm ring-1 ring-slate-900/10 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-slate-600"
           aria-label="Change note color"
           aria-expanded={isColorPickerOpen}
           onClick={() => setIsColorPickerOpen((isOpen) => !isOpen)}
@@ -305,7 +305,7 @@ export function StickyNote({
         </button>
         {isColorPickerOpen && (
           <div
-            className="mt-1 flex gap-1 rounded-md bg-white/90 p-1.5 shadow"
+            className="absolute top-8 right-0 mt-1 flex gap-1 rounded-md bg-white/90 p-1.5 shadow"
             aria-label="Note colors"
           >
             {NOTE_COLORS.map((color) => (
@@ -326,7 +326,7 @@ export function StickyNote({
       {isEditing ? (
         <textarea
           ref={textareaRef}
-          className="block h-full w-full resize-none border-0 bg-transparent p-0 outline-none select-text"
+          className="block h-full w-full resize-none border-0 bg-transparent px-0 pt-5 pb-0 outline-none select-text"
           value={note.text}
           onChange={(event) => updateNoteText(note.id, event.target.value)}
           onPointerDown={(event) => event.stopPropagation()}
@@ -335,7 +335,7 @@ export function StickyNote({
           onBlur={() => setIsEditing(false)}
         />
       ) : (
-        <div className="h-full w-full whitespace-pre-wrap">
+        <div className="h-full w-full pt-5 whitespace-pre-wrap">
           {note.text}
         </div>
       )}
