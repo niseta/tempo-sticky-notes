@@ -5,10 +5,11 @@ import { StickyNote } from './StickyNote';
 interface BoardProps {
   notes: Note[];
   moveNote: (id: Note['id'], x: number, y: number) => void;
+  resizeNote: (id: Note['id'], width: number, height: number) => void;
   bringToFront: (id: Note['id']) => void;
 }
 
-export function Board({ notes, moveNote, bringToFront }: BoardProps) {
+export function Board({ notes, moveNote, resizeNote, bringToFront }: BoardProps) {
   const boardRef = useRef<HTMLElement>(null);
 
   return (
@@ -19,6 +20,7 @@ export function Board({ notes, moveNote, bringToFront }: BoardProps) {
           note={note}
           boardRef={boardRef}
           moveNote={moveNote}
+          resizeNote={resizeNote}
           bringToFront={bringToFront}
         />
       ))}

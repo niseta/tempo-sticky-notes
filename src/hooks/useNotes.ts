@@ -32,6 +32,14 @@ export function useNotes() {
     );
   }
 
+  function resizeNote(id: Note['id'], width: number, height: number) {
+    setNotes((currentNotes) =>
+      currentNotes.map((note) =>
+        note.id === id ? { ...note, width, height } : note,
+      ),
+    );
+  }
+
   function bringToFront(id: Note['id']) {
     setNotes((currentNotes) => {
       const highestZIndex = currentNotes.reduce(
@@ -45,5 +53,5 @@ export function useNotes() {
     });
   }
 
-  return { notes, addNote, moveNote, bringToFront };
+  return { notes, addNote, moveNote, resizeNote, bringToFront };
 }
