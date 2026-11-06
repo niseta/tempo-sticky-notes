@@ -1,10 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Note } from '../types/note';
 
 type NewNote = Omit<Note, 'id' | 'zIndex'>;
 
+const STORAGE_KEY = 'sticky-notes';
+
 export function useNotes() {
-  const [notes, setNotes] = useState<Note[]>([]);
+  const [notes, setNotes] = useState<Note[]>(() => {
+    try {
+      const savedNotes: unknown = JSON.parse(
+        window.localStorage.getItem(STORAGE_KEY) ?? '[]',
+      );
+
+      return Array.isArray(savedNotes) ? (savedNotes as Note[]) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    } catch {
+      // The application remains usable when localStorage is unavailable.
+    }
+  }, [notes]);
 
   function addNote(newNote: NewNote) {
     setNotes((currentNotes) => {
