@@ -13,7 +13,7 @@ A desktop-focused sticky notes board built with React and TypeScript as a take-h
 
 ## Features
 
-- Create notes with default text, size, position, and color.
+- Create notes with predefined initial dimensions and position, which can be adjusted through dragging and resizing.
 - Drag notes within the board boundaries.
 - Resize notes using the bottom-right handle.
 - Edit note text in place with a double-click.
@@ -62,13 +62,19 @@ src/
 └── main.tsx             # Application entry point
 ```
 
-## Technical Decisions
+## Architecture
 
-- **State management:** A custom `useNotes` hook centralizes note operations and persistence, keeping UI components focused on rendering and interactions.
-- **Drag and resize:** Native Pointer Events and pointer capture handle interactions without external drag-and-drop dependencies. Mutable interaction data is stored in refs to avoid unnecessary renders.
-- **Positioning and stacking:** Notes are constrained to the board during dragging and use dynamic `z-index` values to manage overlapping notes.
-- **Persistence:** Notes are stored in `localStorage` and restored on initialization. Storage errors are handled gracefully so the application remains usable.
-- **Type safety:** TypeScript defines the note model and shared types, while `crypto.randomUUID()` generates unique note identifiers.
+The application is structured around reusable React components, with state management centralized in a custom `useNotes` hook. This hook handles note creation, updates, deletion, stacking order, and persistence, while the UI components are responsible for rendering and user interactions. TypeScript interfaces define the note data model and provide type safety across the application.
+
+Dragging and resizing are implemented using native Pointer Events and pointer capture, without relying on external drag-and-drop libraries. Interaction data is stored in refs to avoid unnecessary state updates, while note positions and stacking order are managed through React state. Notes are constrained to the board boundaries during dragging.
+
+Notes are persisted in `localStorage` and restored when the application loads. Storage errors are handled gracefully to keep the application usable even when persistence is unavailable. The application uses Vite for development and production builds, and Tailwind CSS for styling.
+
+## Assumptions
+
+- New notes are created with predefined dimensions and an initial position.
+- The application is assumed to be single-user and browser-local, without requiring user accounts or synchronization across devices.
+- Text editing is activated by double-clicking a note to avoid interfering with dragging.
 
 ## Usage
 
