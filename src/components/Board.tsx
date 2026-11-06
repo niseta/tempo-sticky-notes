@@ -7,6 +7,7 @@ interface BoardProps {
   notes: Note[];
   moveNote: (id: Note["id"], x: number, y: number) => void;
   resizeNote: (id: Note["id"], width: number, height: number) => void;
+  updateNoteText: (id: Note["id"], text: string) => void;
   deleteNote: (id: Note["id"]) => void;
   bringToFront: (id: Note["id"]) => void;
 }
@@ -15,6 +16,7 @@ export function Board({
   notes,
   moveNote,
   resizeNote,
+  updateNoteText,
   deleteNote,
   bringToFront,
 }: BoardProps) {
@@ -33,6 +35,7 @@ export function Board({
             trashZoneRef={trashZoneRef}
             moveNote={moveNote}
             resizeNote={resizeNote}
+            updateNoteText={updateNoteText}
             deleteNote={deleteNote}
             bringToFront={bringToFront}
             setIsTrashActive={setIsTrashActive}

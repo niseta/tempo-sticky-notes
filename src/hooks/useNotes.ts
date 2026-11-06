@@ -40,6 +40,14 @@ export function useNotes() {
     );
   }
 
+  function updateNoteText(id: Note['id'], text: string) {
+    setNotes((currentNotes) =>
+      currentNotes.map((note) =>
+        note.id === id ? { ...note, text } : note,
+      ),
+    );
+  }
+
   function deleteNote(id: Note['id']) {
     setNotes((currentNotes) =>
       currentNotes.filter((note) => note.id !== id),
@@ -59,5 +67,13 @@ export function useNotes() {
     });
   }
 
-  return { notes, addNote, moveNote, resizeNote, deleteNote, bringToFront };
+  return {
+    notes,
+    addNote,
+    moveNote,
+    resizeNote,
+    updateNoteText,
+    deleteNote,
+    bringToFront,
+  };
 }

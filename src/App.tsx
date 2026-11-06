@@ -2,8 +2,15 @@ import { Board } from './components/Board';
 import { useNotes } from './hooks/useNotes';
 
 function App() {
-  const { notes, addNote, moveNote, resizeNote, deleteNote, bringToFront } =
-    useNotes();
+  const {
+    notes,
+    addNote,
+    moveNote,
+    resizeNote,
+    updateNoteText,
+    deleteNote,
+    bringToFront,
+  } = useNotes();
 
   function handleAddNote() {
     addNote({
@@ -32,6 +39,7 @@ function App() {
         notes={notes}
         moveNote={moveNote}
         resizeNote={resizeNote}
+        updateNoteText={updateNoteText}
         deleteNote={deleteNote}
         bringToFront={bringToFront}
       />

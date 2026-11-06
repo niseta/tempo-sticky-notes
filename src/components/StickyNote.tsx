@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   Dispatch,
   PointerEvent as ReactPointerEvent,
@@ -13,6 +13,7 @@ interface StickyNoteProps {
   trashZoneRef: RefObject<HTMLDivElement | null>;
   moveNote: (id: Note["id"], x: number, y: number) => void;
   resizeNote: (id: Note["id"], width: number, height: number) => void;
+  updateNoteText: (id: Note["id"], text: string) => void;
   deleteNote: (id: Note["id"]) => void;
   bringToFront: (id: Note["id"]) => void;
   setIsTrashActive: Dispatch<SetStateAction<boolean>>;
@@ -41,12 +42,45 @@ export function StickyNote({
   trashZoneRef,
   moveNote,
   resizeNote,
+  updateNoteText,
   deleteNote,
   bringToFront,
   setIsTrashActive,
 }: StickyNoteProps) {
+  const [isEditing, setIsEditing] = useState(false);
   const dragInfoRef = useRef<DragInfo | null>(null);
   const resizeInfoRef = useRef<ResizeInfo | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!isEditing) {
+      return;
+    }
+
+    const textarea = textareaRef.current;
+
+    if (textarea) {
+      textarea.focus();
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+    }
+
+    function handleOutsidePointerDown(event: PointerEvent) {
+      if (
+        event.target instanceof Node &&
+        textareaRef.current?.contains(event.target)
+      ) {
+        return;
+      }
+
+      setIsEditing(false);
+    }
+
+    document.addEventListener("pointerdown", handleOutsidePointerDown, true);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsidePointerDown, true);
+    };
+  }, [isEditing]);
 
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (!event.isPrimary || event.button !== 0 || !boardRef.current) {
@@ -63,7 +97,6 @@ export function StickyNote({
 
     bringToFront(note.id);
     event.currentTarget.setPointerCapture(event.pointerId);
-    event.preventDefault();
   }
 
   function updatePosition(event: ReactPointerEvent<HTMLDivElement>) {
@@ -209,12 +242,13 @@ export function StickyNote({
 
   return (
     <div
-      className="overflow-hidden bg-yellow-200 p-4 text-slate-800 shadow-md"
+      className="select-none overflow-hidden bg-yellow-200 p-4 text-slate-800 shadow-md"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={finishDragging}
       onLostPointerCapture={finishDragging}
+      onDoubleClick={() => setIsEditing(true)}
       style={{
         position: "absolute",
         left: note.x,
@@ -225,7 +259,22 @@ export function StickyNote({
         touchAction: "none",
       }}
     >
-      {note.text}
+      {isEditing ? (
+        <textarea
+          ref={textareaRef}
+          className="block h-full w-full resize-none border-0 bg-transparent p-0 outline-none select-text"
+          value={note.text}
+          onChange={(event) => updateNoteText(note.id, event.target.value)}
+          onPointerDown={(event) => event.stopPropagation()}
+          onDoubleClick={(event) => event.stopPropagation()}
+          onFocus={() => bringToFront(note.id)}
+          onBlur={() => setIsEditing(false)}
+        />
+      ) : (
+        <div className="h-full w-full whitespace-pre-wrap">
+          {note.text}
+        </div>
+      )}
       <div
         className="absolute right-1 bottom-1 h-3 w-3 cursor-se-resize border-r-2 border-b-2 border-slate-600/60"
         onPointerDown={handleResizePointerDown}
@@ -233,6 +282,7 @@ export function StickyNote({
         onPointerUp={handleResizePointerUp}
         onPointerCancel={finishResizing}
         onLostPointerCapture={finishResizing}
+        onDoubleClick={(event) => event.stopPropagation()}
       />
     </div>
   );
