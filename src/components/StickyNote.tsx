@@ -152,11 +152,19 @@ export function StickyNote({
       return;
     }
 
+    if ((event.buttons & 1) === 0) {
+      finishDragging(event, isPointerInsideTrash(event));
+      return;
+    }
+
     updatePosition(event);
     setIsTrashActive(isPointerInsideTrash(event));
   }
 
-  function finishDragging(event: ReactPointerEvent<HTMLDivElement>) {
+  function finishDragging(
+    event: ReactPointerEvent<HTMLDivElement>,
+    shouldDelete = false,
+  ) {
     if (dragInfoRef.current?.pointerId !== event.pointerId) {
       return;
     }
@@ -166,6 +174,10 @@ export function StickyNote({
 
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    if (shouldDelete) {
+      deleteNote(note.id);
     }
   }
 
@@ -178,11 +190,20 @@ export function StickyNote({
 
     const shouldDelete = isPointerInsideTrash(event);
 
-    finishDragging(event);
+    finishDragging(event, shouldDelete);
+  }
 
-    if (shouldDelete) {
-      deleteNote(note.id);
+  function handleLostPointerCapture(
+    event: ReactPointerEvent<HTMLDivElement>,
+  ) {
+    if (dragInfoRef.current?.pointerId !== event.pointerId) {
+      return;
     }
+
+    const shouldDelete =
+      (event.buttons & 1) === 0 && isPointerInsideTrash(event);
+
+    finishDragging(event, shouldDelete);
   }
 
   function handleResizePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
@@ -263,7 +284,7 @@ export function StickyNote({
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onPointerCancel={finishDragging}
-      onLostPointerCapture={finishDragging}
+      onLostPointerCapture={handleLostPointerCapture}
       onDoubleClick={() => setIsEditing(true)}
       style={{
         position: "absolute",
